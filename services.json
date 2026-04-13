@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Plataforma Educativa Interactiva",
+    "category": "Educativo",
+    "shortDescription": "Sistema de aprendizaje adaptativo con recursos digitales.",
+    "fullDescription": "Servicio orientado a instituciones o usuarios que requieren entornos de formación con contenidos, seguimiento académico y acceso multiplataforma.",
+    "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
+    "featured": true
+  },
+  {
+    "id": 2,
+    "name": "Soluciones Cloud Empresariales",
+    "category": "Tecnológico",
+    "shortDescription": "Infraestructura escalable y segura para operación digital.",
+    "fullDescription": "Servicio enfocado en despliegue y acompañamiento de soluciones en la nube para mejorar disponibilidad, escalabilidad y continuidad operativa.",
+    "image": "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80",
+    "featured": true
+  },
+  {
+    "id": 3,
+    "name": "Turismo Virtual 360°",
+    "category": "Turístico",
+    "shortDescription": "Experiencias inmersivas para conocer destinos de forma digital.",
+    "fullDescription": "Servicio que presenta recorridos virtuales e información de destinos mediante recursos interactivos de alta calidad visual.",
+    "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+    "featured": true
+  },
+  {
+    "id": 4,
+    "name": "Tienda Comercial Digital",
+    "category": "Comercial",
+    "shortDescription": "Catálogo web para exhibición y promoción de productos o servicios.",
+    "fullDescription": "Servicio orientado a negocios que necesitan presencia digital para mostrar su portafolio, ampliar alcance y facilitar el contacto con clientes.",
+    "image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80",
+    "featured": false
+  },
+  {
+    "id": 5,
+    "name": "App Móvil Personalizada",
+    "category": "Tecnológico",
+    "shortDescription": "Desarrollo de aplicaciones móviles para Android y iOS.",
+    "fullDescription": "Servicio para organizaciones que requieren una aplicación móvil funcional, intuitiva y adaptada a sus procesos o modelo de negocio.",
+    "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80",
+    "featured": false
+  },
+  {
+    "id": 6,
+    "name": "Guías Turísticas Inteligentes",
+    "category": "Turístico",
+    "shortDescription": "Rutas sugeridas y experiencias organizadas por destino.",
+    "fullDescription": "Servicio de apoyo al viajero con información consolidada, recomendaciones y planeación básica de recorridos turísticos.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
+    "featured": false
+  }
+]
