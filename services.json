@@ -1,56 +1,50 @@
 [
   {
     "id": 1,
-    "name": "Plataforma Educativa Interactiva",
-    "category": "Educativo",
-    "shortDescription": "Sistema de aprendizaje adaptativo con recursos digitales.",
-    "fullDescription": "Servicio orientado a instituciones o usuarios que requieren entornos de formación con contenidos, seguimiento académico y acceso multiplataforma.",
-    "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80",
-    "featured": true
+    "name": "Curso Avanzado de Angular",
+    "category": "Educación",
+    "shortDescription": "Aprende a construir SPAs modernas con el framework de Google desde cero.",
+    "fullDescription": "Domina el desarrollo frontend con Angular mediante componentes, binding, servicios y estructuras reutilizables. Ideal para fortalecer fundamentos de desarrollo web moderno.",
+    "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80"
   },
   {
     "id": 2,
-    "name": "Soluciones Cloud Empresariales",
-    "category": "Tecnológico",
-    "shortDescription": "Infraestructura escalable y segura para operación digital.",
-    "fullDescription": "Servicio enfocado en despliegue y acompañamiento de soluciones en la nube para mejorar disponibilidad, escalabilidad y continuidad operativa.",
-    "image": "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80",
-    "featured": true
+    "name": "Consultoría Cloud AWS",
+    "category": "Tecnología",
+    "shortDescription": "Optimiza tu infraestructura y reduce costos migrando a la nube.",
+    "fullDescription": "Servicio orientado a evaluar, diseñar y optimizar ambientes cloud empresariales con enfoque en disponibilidad, escalabilidad y eficiencia operativa.",
+    "image": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80"
   },
   {
     "id": 3,
-    "name": "Turismo Virtual 360°",
-    "category": "Turístico",
-    "shortDescription": "Experiencias inmersivas para conocer destinos de forma digital.",
-    "fullDescription": "Servicio que presenta recorridos virtuales e información de destinos mediante recursos interactivos de alta calidad visual.",
-    "image": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-    "featured": true
+    "name": "Tour Virtual Roma Antigua",
+    "category": "Turismo",
+    "shortDescription": "Vive una experiencia inmersiva histórica desde la comodidad de tu casa.",
+    "fullDescription": "Explora destinos históricos mediante recorridos virtuales con contenido visual, descriptivo y navegación intuitiva para el usuario.",
+    "image": "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=1200&q=80"
   },
   {
     "id": 4,
-    "name": "Tienda Comercial Digital",
+    "name": "Plan de Marketing Digital",
     "category": "Comercial",
-    "shortDescription": "Catálogo web para exhibición y promoción de productos o servicios.",
-    "fullDescription": "Servicio orientado a negocios que necesitan presencia digital para mostrar su portafolio, ampliar alcance y facilitar el contacto con clientes.",
-    "image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80",
-    "featured": false
+    "shortDescription": "Estrategias personalizadas para aumentar tu presencia online.",
+    "fullDescription": "Servicio comercial enfocado en visibilidad digital, campañas, optimización de contenidos y acompañamiento estratégico para negocios.",
+    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80"
   },
   {
     "id": 5,
-    "name": "App Móvil Personalizada",
-    "category": "Tecnológico",
-    "shortDescription": "Desarrollo de aplicaciones móviles para Android y iOS.",
-    "fullDescription": "Servicio para organizaciones que requieren una aplicación móvil funcional, intuitiva y adaptada a sus procesos o modelo de negocio.",
-    "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80",
-    "featured": false
+    "name": "Auditoría de Ciberseguridad",
+    "category": "Tecnología",
+    "shortDescription": "Protege los datos de tu empresa contra amenazas externas.",
+    "fullDescription": "Evaluación técnica orientada a identificar vulnerabilidades, fortalecer controles y mejorar el nivel de protección de los activos digitales.",
+    "image": "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&w=1200&q=80"
   },
   {
     "id": 6,
-    "name": "Guías Turísticas Inteligentes",
-    "category": "Turístico",
-    "shortDescription": "Rutas sugeridas y experiencias organizadas por destino.",
-    "fullDescription": "Servicio de apoyo al viajero con información consolidada, recomendaciones y planeación básica de recorridos turísticos.",
-    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80",
-    "featured": false
+    "name": "Diseño de Interfaz UX/UI",
+    "category": "Comercial",
+    "shortDescription": "Creamos productos digitales intuitivos y atractivos.",
+    "fullDescription": "Diseño visual y funcional de interfaces centradas en la experiencia del usuario, con enfoque en claridad, accesibilidad y estética.",
+    "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80"
   }
 ]

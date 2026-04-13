@@ -1,310 +1,384 @@
-const STORAGE_KEYS = {
-  services: 'saberdigital_services',
-  favorites: 'saberdigital_favorites'
-};
+const STORAGE_KEY = "saberdigital_services";
+const FAVORITES_KEY = "saberdigital_favorites";
 
 let services = [];
-let favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites)) || [];
+let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
 let selectedServiceId = null;
+let currentCategory = "Todos";
 
-const pages = document.querySelectorAll('.page');
-const routeLinks = document.querySelectorAll('.route-link');
-const featuredServicesContainer = document.getElementById('featured-services');
-const servicesListContainer = document.getElementById('services-list');
-const favoritesListContainer = document.getElementById('favorites-list');
-const serviceDetailContainer = document.getElementById('service-detail');
-const manageServicesList = document.getElementById('manage-services-list');
-const manageCount = document.getElementById('manage-count');
-const categoryFilter = document.getElementById('category-filter');
-const heroTotalServices = document.getElementById('hero-total-services');
-const heroTotalFavorites = document.getElementById('hero-total-favorites');
+document.addEventListener("DOMContentLoaded", async () => {
+  bindMenu();
+  bindRoutes();
+  bindFilters();
+  bindManageForm();
+  bindContactForm();
 
-const fallbackServices = [
-  {
-    id: 1,
-    name: 'Plataforma Educativa Interactiva',
-    category: 'Educativo',
-    shortDescription: 'Sistema de aprendizaje adaptativo con recursos digitales.',
-    fullDescription: 'Servicio orientado a instituciones o usuarios que requieren entornos de formación con contenidos, seguimiento académico y acceso multiplataforma.',
-    image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80',
-    featured: true
-  },
-  {
-    id: 2,
-    name: 'Soluciones Cloud Empresariales',
-    category: 'Tecnológico',
-    shortDescription: 'Infraestructura escalable y segura para operación digital.',
-    fullDescription: 'Servicio enfocado en despliegue y acompañamiento de soluciones en la nube para mejorar disponibilidad, escalabilidad y continuidad operativa.',
-    image: 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1200&q=80',
-    featured: true
-  },
-  {
-    id: 3,
-    name: 'Turismo Virtual 360°',
-    category: 'Turístico',
-    shortDescription: 'Experiencias inmersivas para conocer destinos de forma digital.',
-    fullDescription: 'Servicio que presenta recorridos virtuales e información de destinos mediante recursos interactivos de alta calidad visual.',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80',
-    featured: true
-  },
-  {
-    id: 4,
-    name: 'Tienda Comercial Digital',
-    category: 'Comercial',
-    shortDescription: 'Catálogo web para exhibición y promoción de productos o servicios.',
-    fullDescription: 'Servicio orientado a negocios que necesitan presencia digital para mostrar su portafolio, ampliar alcance y facilitar el contacto con clientes.',
-    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80',
-    featured: false
-  }
-];
+  await loadServices();
+  renderAll();
+  showPage("home");
+});
 
 async function loadServices() {
-  const savedServices = JSON.parse(localStorage.getItem(STORAGE_KEYS.services));
-  if (savedServices?.length) {
-    services = savedServices;
-    renderAll();
+  const stored = localStorage.getItem(STORAGE_KEY);
+
+  if (stored) {
+    services = JSON.parse(stored);
     return;
   }
 
   try {
-    const response = await fetch('services.json');
-    if (!response.ok) throw new Error('No fue posible cargar services.json');
+    const response = await fetch("services.json");
     services = await response.json();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(services));
   } catch (error) {
-    services = fallbackServices;
+    services = [];
   }
-
-  persistServices();
-  renderAll();
 }
 
-function persistServices() {
-  localStorage.setItem(STORAGE_KEYS.services, JSON.stringify(services));
+function saveServices() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(services));
 }
 
-function persistFavorites() {
-  localStorage.setItem(STORAGE_KEYS.favorites, JSON.stringify(favorites));
+function saveFavorites() {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
 }
 
-function changeRoute(route) {
-  pages.forEach(page => page.classList.remove('active-page'));
-  document.getElementById(`page-${route}`).classList.add('active-page');
-  routeLinks.forEach(link => {
-    link.classList.toggle('active', link.dataset.route === route);
+function bindMenu() {
+  const toggle = document.getElementById("menuToggle");
+  const mobileMenu = document.getElementById("mobileMenu");
+
+  toggle.addEventListener("click", () => {
+    mobileMenu.classList.toggle("hidden");
   });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function bindRoutes() {
+  document.addEventListener("click", (e) => {
+    const routeItem = e.target.closest("[data-route]");
+    if (!routeItem) return;
+
+    e.preventDefault();
+    const pageId = routeItem.dataset.route;
+    showPage(pageId);
+
+    const mobileMenu = document.getElementById("mobileMenu");
+    if (!mobileMenu.classList.contains("hidden")) {
+      mobileMenu.classList.add("hidden");
+    }
+  });
+}
+
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+  const page = document.getElementById(pageId);
+  if (page) page.classList.add("active");
+
+  setActiveNav(pageId);
+
+  if (pageId === "catalogo") renderCatalog();
+  if (pageId === "favoritos") renderFavorites();
+  if (pageId === "gestion") renderManageList();
+  if (pageId === "detalle") renderDetail(selectedServiceId);
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function setActiveNav(pageId) {
+  document.querySelectorAll(".nav-link, .mobile-link").forEach(link => {
+    link.classList.remove("active-link");
+    if (link.dataset.route === pageId) {
+      link.classList.add("active-link");
+    }
+  });
 }
 
 function renderAll() {
-  renderFeaturedServices();
-  renderServicesList();
+  renderFeatured();
+  renderCatalog();
   renderFavorites();
   renderManageList();
-  updateCounters();
-
-  if (selectedServiceId) {
-    renderDetail(selectedServiceId);
-  }
 }
 
-function updateCounters() {
-  heroTotalServices.textContent = services.length;
-  heroTotalFavorites.textContent = favorites.length;
-  manageCount.textContent = `${services.length} servicio${services.length !== 1 ? 's' : ''}`;
+function bindFilters() {
+  document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener("change", () => {
+      currentCategory = input.value;
+      renderCatalog();
+    });
+  });
 }
 
-function getCategoryClass(category) {
-  return `<span class="category-badge">${category}</span>`;
-}
+function renderFeatured() {
+  const container = document.getElementById("featuredServices");
+  const featured = services.slice(0, 3);
 
-function createCard(service, showDelete = false) {
-  const isFavorite = favorites.includes(service.id);
-
-  return `
-    <div class="col-md-6 col-xl-4">
-      <article class="service-card h-100">
-        <img src="${service.image}" alt="${service.name}">
-        <div class="p-4 d-flex flex-column h-100">
-          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-            ${getCategoryClass(service.category)}
-            <button class="btn btn-sm favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${service.id})" title="Favorito">
-              ${isFavorite ? '♥' : '♡'}
-            </button>
-          </div>
-          <h3 class="h5 fw-bold">${service.name}</h3>
-          <p class="text-muted flex-grow-1 mb-4">${service.shortDescription}</p>
-          <div class="d-flex gap-2 flex-wrap">
-            <button class="btn btn-primary-custom flex-grow-1" onclick="openDetail(${service.id})">Ver más</button>
-            ${showDelete ? `<button class="btn btn-outline-danger" onclick="deleteService(${service.id})">Eliminar</button>` : ''}
-          </div>
-        </div>
-      </article>
+  container.innerHTML = featured.map(service => `
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:shadow-xl transition-all duration-300">
+      <img src="${service.image}" alt="${service.name}" class="service-image mb-4">
+      <span class="text-xs font-semibold text-primary uppercase tracking-wider">${service.category}</span>
+      <h3 class="text-xl font-bold text-secondary mt-1 group-hover:text-primary transition">${service.name}</h3>
+      <p class="text-slate-600 text-sm mt-2">${service.shortDescription}</p>
+      <button onclick="openDetail(${service.id})" class="mt-5 w-full bg-slate-50 text-secondary font-semibold py-2.5 rounded-lg border hover:bg-primary hover:text-white hover:border-primary transition">
+        Ver más detalle
+      </button>
     </div>
-  `;
+  `).join("");
 }
 
-function renderFeaturedServices() {
-  const featured = services.filter(service => service.featured).slice(0, 3);
-  featuredServicesContainer.innerHTML = featured.map(service => createCard(service)).join('');
-}
+function renderCatalog() {
+  const container = document.getElementById("servicesList");
 
-function renderServicesList() {
-  const filter = categoryFilter.value;
-  const filteredServices = filter === 'all'
+  const filtered = currentCategory === "Todos"
     ? services
-    : services.filter(service => service.category === filter);
+    : services.filter(service => service.category === currentCategory);
 
-  servicesListContainer.innerHTML = filteredServices.length
-    ? filteredServices.map(service => createCard(service)).join('')
-    : `<div class="col-12"><div class="empty-state">No hay servicios para la categoría seleccionada.</div></div>`;
+  if (!filtered.length) {
+    container.innerHTML = `
+      <div class="col-span-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center text-slate-500">
+        No hay servicios disponibles para esta categoría.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(service => `
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:shadow-xl transition relative">
+      <button onclick="toggleFavorite(${service.id})" class="absolute top-4 right-4 bg-white/80 p-2 rounded-full text-xl ${favorites.includes(service.id) ? 'favorite-active' : 'text-gray-400'} hover:text-red-500 transition">
+        ♥
+      </button>
+      <img src="${service.image}" alt="${service.name}" class="service-image mb-4">
+      <span class="text-xs font-semibold text-primary uppercase tracking-wider">${service.category}</span>
+      <h3 class="text-lg font-bold text-secondary mt-1 group-hover:text-primary transition">${service.name}</h3>
+      <p class="text-slate-600 text-xs mt-2">${service.shortDescription}</p>
+      <button onclick="openDetail(${service.id})" class="mt-4 w-full text-sm bg-slate-50 text-secondary font-semibold py-2 rounded-lg border hover:bg-primary hover:text-white transition">
+        Ver detalles
+      </button>
+    </div>
+  `).join("");
 }
 
-function renderDetail(serviceId) {
-  const service = services.find(item => item.id === serviceId);
-  if (!service) return;
+function openDetail(id) {
+  selectedServiceId = id;
+  renderDetail(id);
+  showPage("detalle");
+}
+
+function renderDetail(id) {
+  const container = document.getElementById("serviceDetail");
+  const service = services.find(item => item.id === id);
+
+  if (!service) {
+    container.innerHTML = `
+      <div class="bg-white p-8 rounded-3xl shadow-lg border border-gray-100 text-center text-slate-500">
+        Servicio no encontrado.
+      </div>
+    `;
+    return;
+  }
 
   const isFavorite = favorites.includes(service.id);
-  serviceDetailContainer.innerHTML = `
-    <div class="detail-box p-3 p-lg-4">
-      <div class="row g-4 align-items-stretch">
-        <div class="col-lg-6">
-          <img class="detail-image" src="${service.image}" alt="${service.name}">
+
+  container.innerHTML = `
+    <div class="flex flex-col md:flex-row gap-10 items-start">
+      <div class="flex-1 w-full space-y-4">
+        <div class="bg-white p-4 rounded-3xl shadow-lg border border-gray-100">
+          <img src="${service.image}" alt="${service.name}" class="detail-image">
         </div>
-        <div class="col-lg-6 d-flex flex-column">
-          ${getCategoryClass(service.category)}
-          <h2 class="fw-bold mt-3">${service.name}</h2>
-          <p class="text-muted mb-3">${service.shortDescription}</p>
-          <p class="mb-4">${service.fullDescription}</p>
-          <div class="d-flex gap-2 flex-wrap mt-auto">
-            <button class="btn btn-primary-custom" onclick="changeRoute('contact')">Contactar</button>
-            <button class="btn favorite-btn ${isFavorite ? 'active' : ''}" onclick="toggleFavorite(${service.id})">
-              ${isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-            </button>
-          </div>
+      </div>
+
+      <div class="flex-1 space-y-6 bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+        <span class="inline-block bg-blue-100 text-primary text-xs font-semibold px-3 py-1 rounded-full">${service.category.toUpperCase()}</span>
+        <h1 class="text-4xl font-extrabold text-secondary leading-tight">${service.name}</h1>
+        <p class="text-2xl font-bold text-slate-900">$199.99 <span class="text-sm text-slate-500 font-normal">/ pago único</span></p>
+
+        <div class="border-t border-b py-6 space-y-4 text-slate-700 leading-relaxed">
+          <h3 class="font-bold text-secondary">Descripción completa</h3>
+          <p>${service.fullDescription}</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+          <button data-route="contacto" class="route-btn flex-1 bg-primary text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-blue-600 transition shadow-md shadow-blue-200">
+            Contactar para Inscribirse
+          </button>
+          <button onclick="toggleFavorite(${service.id})" class="bg-slate-100 ${isFavorite ? 'text-red-500' : 'text-slate-700'} px-6 py-3.5 rounded-xl font-semibold hover:bg-red-50 transition border border-red-100">
+            ♥ ${isFavorite ? 'Quitar de Favoritos' : 'Guardar en Favoritos'}
+          </button>
         </div>
       </div>
     </div>
   `;
 }
 
-function openDetail(serviceId) {
-  selectedServiceId = serviceId;
-  renderDetail(serviceId);
-  changeRoute('detail');
-}
-
-function toggleFavorite(serviceId) {
-  if (favorites.includes(serviceId)) {
-    favorites = favorites.filter(id => id !== serviceId);
+function toggleFavorite(id) {
+  if (favorites.includes(id)) {
+    favorites = favorites.filter(fav => fav !== id);
   } else {
-    favorites.push(serviceId);
+    favorites.push(id);
   }
 
-  persistFavorites();
-  renderAll();
+  saveFavorites();
+  renderFeatured();
+  renderCatalog();
+  renderFavorites();
+
+  if (selectedServiceId === id) {
+    renderDetail(id);
+  }
 }
 
 function renderFavorites() {
+  const container = document.getElementById("favoritesList");
   const favoriteServices = services.filter(service => favorites.includes(service.id));
-  favoritesListContainer.innerHTML = favoriteServices.length
-    ? favoriteServices.map(service => createCard(service)).join('')
-    : `<div class="col-12"><div class="empty-state">Aún no has agregado servicios a favoritos.</div></div>`;
-}
 
-function renderManageList() {
-  manageServicesList.innerHTML = services.length
-    ? services.map(service => `
-        <div class="manage-item d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-          <div>
-            <div class="mb-2">${getCategoryClass(service.category)}</div>
-            <h3 class="h6 fw-bold mb-1">${service.name}</h3>
-            <p class="mb-0 text-muted">${service.shortDescription}</p>
-          </div>
-          <div class="d-flex gap-2">
-            <button class="btn btn-outline-primary" onclick="openDetail(${service.id})">Ver</button>
-            <button class="btn btn-outline-danger" onclick="deleteService(${service.id})">Eliminar</button>
-          </div>
-        </div>
-      `).join('')
-    : `<div class="empty-state">No hay servicios registrados.</div>`;
-}
-
-function deleteService(serviceId) {
-  services = services.filter(service => service.id !== serviceId);
-  favorites = favorites.filter(id => id !== serviceId);
-  if (selectedServiceId === serviceId) selectedServiceId = null;
-  persistServices();
-  persistFavorites();
-  renderAll();
-
-  if (document.getElementById('page-detail').classList.contains('active-page')) {
-    changeRoute('services');
+  if (!favoriteServices.length) {
+    container.innerHTML = `
+      <div class="col-span-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center text-slate-500">
+        No tienes servicios guardados en favoritos.
+      </div>
+    `;
+    return;
   }
+
+  container.innerHTML = favoriteServices.map(service => `
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 group hover:shadow-xl transition relative">
+      <button onclick="toggleFavorite(${service.id})" class="absolute top-4 right-4 bg-white/80 p-2 rounded-full text-xl favorite-active hover:text-red-500 transition">
+        ♥
+      </button>
+      <img src="${service.image}" alt="${service.name}" class="service-image mb-4">
+      <span class="text-xs font-semibold text-primary uppercase tracking-wider">${service.category}</span>
+      <h3 class="text-lg font-bold text-secondary mt-1">${service.name}</h3>
+      <p class="text-slate-600 text-xs mt-2">${service.shortDescription}</p>
+      <button onclick="openDetail(${service.id})" class="mt-4 w-full text-sm bg-slate-50 text-secondary font-semibold py-2 rounded-lg border hover:bg-primary hover:text-white transition">
+        Ver detalles
+      </button>
+    </div>
+  `).join("");
 }
 
-function setupEvents() {
-  document.addEventListener('click', event => {
-    const routeTarget = event.target.closest('[data-route]');
-    if (!routeTarget) return;
-    event.preventDefault();
-    changeRoute(routeTarget.dataset.route);
-  });
+function bindManageForm() {
+  const form = document.getElementById("manageForm");
+  const message = document.getElementById("manageMessage");
 
-  categoryFilter.addEventListener('change', renderServicesList);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    message.classList.add("hidden");
 
-  const manageForm = document.getElementById('manage-form');
-  const manageMessage = document.getElementById('manage-message');
-  manageForm.addEventListener('submit', event => {
-    event.preventDefault();
+    const name = document.getElementById("serviceName");
+    const category = document.getElementById("serviceCategory");
+    const shortDesc = document.getElementById("serviceShort");
+    const fullDesc = document.getElementById("serviceFull");
+    const image = document.getElementById("serviceImage");
 
-    if (!manageForm.checkValidity()) {
-      manageForm.classList.add('was-validated');
-      return;
-    }
+    let valid = true;
+    valid = validateField(name, value => value.trim() !== "") && valid;
+    valid = validateField(category, value => value.trim() !== "") && valid;
+    valid = validateField(shortDesc, value => value.trim() !== "") && valid;
+    valid = validateField(fullDesc, value => value.trim() !== "") && valid;
+    valid = validateField(image, value => /^https?:\/\/.+/i.test(value)) && valid;
+
+    if (!valid) return;
 
     const newService = {
       id: Date.now(),
-      name: document.getElementById('service-name').value.trim(),
-      category: document.getElementById('service-category').value,
-      shortDescription: document.getElementById('service-short').value.trim(),
-      fullDescription: document.getElementById('service-full').value.trim(),
-      image: document.getElementById('service-image').value.trim(),
-      featured: false
+      name: name.value.trim(),
+      category: category.value,
+      shortDescription: shortDesc.value.trim(),
+      fullDescription: fullDesc.value.trim(),
+      image: image.value.trim()
     };
 
     services.push(newService);
-    persistServices();
+    saveServices();
     renderAll();
-    manageForm.reset();
-    manageForm.classList.remove('was-validated');
-    manageMessage.textContent = 'Servicio creado correctamente.';
-    manageMessage.classList.remove('d-none');
-    setTimeout(() => manageMessage.classList.add('d-none'), 2500);
-  });
+    form.reset();
 
-  const contactForm = document.getElementById('contact-form');
-  const contactSuccess = document.getElementById('contact-success');
-  contactForm.addEventListener('submit', event => {
-    event.preventDefault();
-
-    if (!contactForm.checkValidity()) {
-      contactForm.classList.add('was-validated');
-      return;
-    }
-
-    const name = document.getElementById('contact-name').value.trim();
-    contactSuccess.textContent = `Gracias, ${name}. Tu mensaje fue enviado correctamente.`;
-    contactSuccess.classList.remove('d-none');
-    contactForm.reset();
-    contactForm.classList.remove('was-validated');
-    setTimeout(() => contactSuccess.classList.add('d-none'), 3000);
+    message.textContent = "Servicio creado correctamente.";
+    message.classList.remove("hidden");
   });
 }
 
-setupEvents();
-loadServices();
+function renderManageList() {
+  const container = document.getElementById("manageServicesList");
+  const count = document.getElementById("manageCount");
 
-window.toggleFavorite = toggleFavorite;
-window.openDetail = openDetail;
-window.deleteService = deleteService;
-window.changeRoute = changeRoute;
+  count.textContent = `${services.length} servicios`;
+
+  if (!services.length) {
+    container.innerHTML = `<div class="text-slate-500 text-sm">No hay servicios registrados.</div>`;
+    return;
+  }
+
+  container.innerHTML = services.map(service => `
+    <div class="border border-gray-200 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h3 class="font-bold text-secondary">${service.name}</h3>
+        <p class="text-sm text-slate-500">${service.category}</p>
+      </div>
+      <button onclick="deleteService(${service.id})" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-100 transition">
+        Eliminar
+      </button>
+    </div>
+  `).join("");
+}
+
+function deleteService(id) {
+  services = services.filter(service => service.id !== id);
+  favorites = favorites.filter(fav => fav !== id);
+
+  saveServices();
+  saveFavorites();
+
+  if (selectedServiceId === id) {
+    selectedServiceId = null;
+  }
+
+  renderAll();
+}
+
+function bindContactForm() {
+  const form = document.getElementById("contactForm");
+  const success = document.getElementById("contactSuccess");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    success.classList.add("hidden");
+
+    const name = document.getElementById("contactName");
+    const email = document.getElementById("contactEmail");
+    const message = document.getElementById("contactMessage");
+    const policy = document.getElementById("contactPolicy");
+    const policyError = document.getElementById("policyError");
+
+    let valid = true;
+    valid = validateField(name, value => value.trim() !== "") && valid;
+    valid = validateField(email, value => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value)) && valid;
+    valid = validateField(message, value => value.trim() !== "") && valid;
+
+    if (!policy.checked) {
+      policyError.classList.remove("hidden");
+      valid = false;
+    } else {
+      policyError.classList.add("hidden");
+    }
+
+    if (!valid) return;
+
+    form.reset();
+    success.classList.remove("hidden");
+  });
+}
+
+function validateField(field, validator) {
+  const error = field.parentElement.querySelector(".error-text");
+  const isValid = validator(field.value);
+
+  if (!isValid) {
+    field.classList.add("input-error");
+    if (error) error.classList.remove("hidden");
+    return false;
+  }
+
+  field.classList.remove("input-error");
+  if (error) error.classList.add("hidden");
+  return true;
+}
